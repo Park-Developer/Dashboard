@@ -1,0 +1,443 @@
+<!--flaskr/templates/base.html-->
+<!doctype html>
+<html lang="en">
+<head>
+        <!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Robot Dashboard</h1>
+
+</nav>
+
+</head>
+
+<body>
+    <section class="Control_Part">
+        <span class="Control_Part__title">Robot Mode</span>
+        <button type="button">Auto Mode</button> 
+        <button type="button">Manual Mode</button>
+    </section>
+    
+    
+    <section class="Dynamic_View">
+        <div class="Dynamic_View__nav">
+        <span class="dynamic_view__title">Robot View</span>
+        </div>
+    
+        <div class="dynamic_view">
+    
+            <div class="Robot_Camera container">
+                <div class="row">
+                    <div class="col-lg-8  offset-lg-2">
+                        <h3 class="mt-5">Camera View</h3>
+                        <img src="{{ url_for('dashboard.camera_run') }}" width="100%">
+                    </div>
+                </div>
+            </div>
+    
+            <div class="Robot_Bound">
+                <div class="Robot_Bound__Display">
+                    <h3>Robot Bound</h3>
+                    <img src="{{ url_for('dashboard.ani_png') }}" width="100%">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <section class="Sensor_Info">
+        <div class="Sensor_Info_nav">
+          <h3 class="dynamic_view__title">Sensor Data</h3>
+        </div>
+        
+        <div class="Sensor_Data" display:flex>
+          <!--PART1 : Current State-->
+          <div class="Sensor_Data_CurrentState" width="30%">
+            <h3 class="CurrentState__title" style="text-align:center">Current State</h3>
+            <div class="Servo_Motor">
+                <span class="Servo__title">Servo Data : </span>
+                <span class="Servo__data">None</span>
+            </div>
+    
+            <div class="IR_Sensor">
+                <span class="IR__title">IR Data : </span>
+                <span class="IR__data">None</span>
+            </div>
+            
+            <div class="Encoder1">
+                <span class=Encoder1__title>Encoder1 Data : </span>
+                <span class=Encoder1__data>None</span>
+            </div>
+    
+            <div class="Encoder2">
+                <span class=Encoder2__title>Encoder2 Data : </span>
+                <span class=Encoder2__data>None</span>
+            </div>
+    
+            <div class="Ultrasonic_Sensor1">
+                <span class=Ultra1__title>Ultra1 Data : </span>
+                <span class=Ultra1__data></span>
+            </div>
+            
+            <div class="Ultrasonic_Sensor2">
+                <span class=Ultra2__title>Ultra2 Data : </span>
+                <span class=Ultra2__data>None</span>
+            </div>
+    
+            <div class="Gyro_Sensor">
+                <span class=Gyro__title>Gyro Data : </span>
+                <span id="test" class=Gyro__data></span>
+            </div>   
+          </div>
+          
+          <!--PART2 : Time Log-->
+          <div class="Sensor_Data_Log" width="70%">
+            <h3 class="Sensor_Data_Log_title" style="text-align:center">Data Log</h3>
+            <div class="Sensor_Data__motion">
+                <div>
+                <canvas id="Encoder1_chart"  height="250"></canvas>  
+                </div>
+
+                <div>
+                <canvas id="Encoder2_chart"  height="250"></canvas>
+                </div>
+
+                <div>
+                <canvas id="Gyro_chart"  height="250"></canvas>
+                </div>
+            </div>
+            <div class="Sensor_Data__detection">
+                <div>
+                <canvas id="Servo_chart" height="250"></canvas>
+                </div>
+
+                <div>
+                <canvas id="IR_chart"  height="250"></canvas>
+                </div>
+
+                <div>
+                <canvas id="Ultra1_chart" height="250"></canvas>
+                </div>
+
+                <div>
+                <canvas id="Ultra2_chart"  height="250"></canvas>
+                </div>
+            </div>
+            
+          </div>
+        </div>
+        </section>
+    
+
+ 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>  
+    
+    <script>
+    const SENSOR_INFO={
+  "sensor_data_number":7,
+
+  "sensor_class_list":[
+    "Servo__data",
+    "IR__data",
+    "Encoder1__data",
+    "Encoder2__data",
+    "Ultra1__data",
+    "Ultra2__data",
+    "Gyro__data"
+  ],
+
+  "sensor_delimiter":"#",
+  "data_delimiter":"_",
+
+};
+
+
+let SERVO_DOM =document.querySelector(".Servo__data");
+let IR_DOM =document.querySelector(".IR__data");
+let ENCODER1_DOM =document.querySelector(".Encoder1__data");
+let ENCODER2_DOM =document.querySelector(".Encoder2__data");
+let ULTRA1_DOM =document.querySelector(".Ultra1__data");
+let ULTRA2_DOM =document.querySelector(".Ultra2__data");
+let GYRO_DOM =document.querySelector(".Gyro__data");
+
+let SENSOR_DOM=[
+  SERVO_DOM, 
+IR_DOM, 
+ENCODER1_DOM, 
+ENCODER2_DOM ,
+ULTRA1_DOM ,
+ULTRA2_DOM,
+GYRO_DOM,
+];
+
+// Sensor Data Repository
+
+Servo_data_Repo=[];
+IR_data_Repo=[];
+Encoder1_data_Repo=[];
+Encoder2_data_Repo=[];
+Ultra1_data_Repo=[];
+Ultra2_data_Repo=[];
+Gyro_data_Repo=[];
+
+//[Chart1] ENCODER1 CHART SETTING
+let Encoder1_chart=new Chart(document.getElementById("Encoder1_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Encoder1 Sensor'
+    }
+  }
+});
+//[Chart2]  ENCODER2 CHART SETTING
+let Encoder2_chart=new Chart(document.getElementById("Encoder2_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Encoder2 Sensor'
+    }
+  }
+});
+//[Chart3]  GYRO CHART SETTING
+let Gyro_chart=new Chart(document.getElementById("Gyro_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Gyro Sensor'
+    }
+  }
+});
+//[Chart4]  Servo CHART SETTING
+let Servo_chart=new Chart(document.getElementById("Servo_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Servo Motor'
+    }
+  }
+});
+//[Chart5]  IR CHART SETTING
+let IR_chart=new Chart(document.getElementById("IR_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'IR Sensor'
+    }
+  }
+});
+//[Chart6]  Ultra1 CHART SETTING
+let Ultra1_chart=new Chart(document.getElementById("Ultra1_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Ultrasonic Sensor1'
+    }
+  }
+});
+//[Chart7]  Ultra2 CHART SETTING
+let Ultra2_chart=new Chart(document.getElementById("Ultra2_chart"), {
+  type: 'line',
+  data: {
+    labels: [0],
+    datasets: [{ 
+        data: [0],
+        label: "Sensing Value",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Ultrasonic Sensor2'
+    }
+  }
+});
+/*
+Function
+*/
+
+
+let time_stamp=0; // UDP data 받은 횟수
+
+function read_sensor_Data(sensor_info, recv_data){
+  console.log("Read Sensor Data");
+  let sensor_data;
+  
+  time_stamp=time_stamp+1;
+  
+  all_recvData=recv_data.split(sensor_info["sensor_delimiter"]).slice(-1*sensor_info["sensor_data_number"]);
+  
+  for (let idx=0;idx<sensor_info["sensor_data_number"];idx++){
+    //Update1 : sensor current state update    
+    sensor_data=all_recvData[idx].split(sensor_info["data_delimiter"]);
+    SENSOR_DOM[idx].innerText=sensor_data[1]; 
+    
+    // Update2 : sensor chart update
+    switch (idx) {
+      case 0: // Servo Data
+        Servo_chart.config.data.labels.push(time_stamp); // X Axis
+        Servo_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Servo_chart.update();
+        break;
+        
+      case 1: // IR Data
+        IR_chart.config.data.labels.push(time_stamp); // X Axis
+        IR_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        IR_chart.update();
+        break;
+      
+      case 2: // Encoder1 Data
+        Encoder1_chart.config.data.labels.push(time_stamp); // X Axis
+        Encoder1_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Encoder1_chart.update();
+        break;
+      
+      case 3: // Encoder2 Data
+        Encoder2_chart.config.data.labels.push(time_stamp); // X Axis
+        Encoder2_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Encoder2_chart.update();
+        break;
+      
+      case 4: // Ultra1 Data
+        Ultra1_chart.config.data.labels.push(time_stamp); // X Axis
+        Ultra1_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Ultra1_chart.update();
+        break;
+      
+      case 5: // Ultra2 Data
+        Ultra2_chart.config.data.labels.push(time_stamp); // X Axis
+        Ultra2_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Ultra2_chart.update();
+        break;
+      
+      case 6: // Gyro Data
+        Gyro_chart.config.data.labels.push(time_stamp); // X Axis
+        Gyro_chart.config.data.datasets[0].data.push(sensor_data[1]); // Y Axis
+        Gyro_chart.update();
+        break;
+    }
+
+
+  }
+  
+}
+/*
+    "Servo__data",
+    "IR__data",
+    "Encoder1__data",
+    "Encoder2__data",
+    "Ultra1__data",
+    "Ultra2__data",
+    "Gyro__data"
+*/
+
+
+// UDP Connection Check #
+
+var latest = document.querySelector('.log_data3');
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', "{{ url_for('dashboard.read_sensor') }}");
+
+xhr.onreadystatechange = function() {
+    /*
+    var all_lines = xhr.responseText.split('#'); // delimiter
+    var last_line = all_lines.length - 2;
+    latest.textContent = all_lines[last_line];
+    console.log(all_lines[last_line]);
+    //console.log(last_line);
+    console.log(all_lines);
+
+    latest.innerHTML=  latest.textContent;
+    */
+    read_sensor_Data(SENSOR_INFO, xhr.responseText); // chart update
+
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        /*alert("The End of Stream");*/
+        latest.textContent = "The End of Stream";
+    }
+}
+
+xhr.send();
+
+
+
+    </script>
+    
+    
+    </body>
+
+
+</html>
