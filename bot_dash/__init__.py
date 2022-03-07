@@ -1,7 +1,8 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
-def create_app(test_config=None):
+
+def create_app(test_config=None): # Application 및 blueprint 등록 함수
     # create and configure the app
     app = Flask(__name__,instance_relative_config=True)
     app.config.from_mapping(
@@ -24,10 +25,9 @@ def create_app(test_config=None):
         pass
 
     
-    # simple page that say hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello World!'
+    @app.route('/')
+    def index_setting(): # index화면 구성 함수
+        return render_template('index.html')
 
     from . import db
     db.init_app(app)
@@ -35,16 +35,19 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
-    from . import blog
-    app.register_blueprint(blog.bp)
-    app.add_url_rule('/',endpoint='index')
+    #from . import blog
+    #app.register_blueprint(blog.bp)
+    #app.add_url_rule('/',endpoint='index')
 
     # Add dashboard 2022.02.03
     from . import dashboard
     app.register_blueprint(dashboard.bp)
+
+    from . import setting
+    app.register_blueprint(setting.bp)
     return app
 
-
+    
 
 
             

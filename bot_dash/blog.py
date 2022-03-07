@@ -8,6 +8,7 @@ from bot_dash.db import get_db
 
 bp = Blueprint('blog', __name__)
 
+'''
 @bp.route('/')
 def index():
     db=get_db()
@@ -17,7 +18,7 @@ def index():
             ' ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html',posts=posts)
-
+'''
 # For Dashboard 2022.02.03
 @bp.route('/dashboard')
 def monitoring():

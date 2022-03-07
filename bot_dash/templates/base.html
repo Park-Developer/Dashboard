@@ -3,25 +3,31 @@
 <title>{% block title %}{% endblock %} - Flaskr</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Flaskr</h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span>
-      <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Register</a>
-      <li><a href="{{ url_for('auth.login') }}">Log In</a>
-    {% endif %}
-    <li><a href="dashboard/monitoring">Dashboard</a>
+  <h1>Monitoring Dashboard</h1>
+
+  <ul class="nav_lists">
+    <li><a href="Setting/setting_index">Setting</a> 
+    <li><a href="Control/control_index">Control</a> 
+    <li><a href="Monitoring/monitoring_index">Monitoring</a>
+    <li><a href="Guide/guide_index">Monitoring</a>
+    <li><a href="dashboard/monitoring">Dashboard</a> <!--RUL 변경 필-->
   </ul>
   
 </nav>
+
 <section class="content">
   <header>
-    {% block header %}{% endblock %}
+    {% block header %}
+    
+    {% endblock %}
   </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
+  <body>
+    {% block content %}
+    
+    {% endblock %}
+    {% block footer %}
+    <p>this is footer</p>
+    {% endblock %}
+  <script></script>
+  </body>
 </section>
