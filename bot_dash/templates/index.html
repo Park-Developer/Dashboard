@@ -11,6 +11,21 @@
 {% block content %}
 <h1>INDEX PAGE</h1>
 
+<h3>Test</h3>
+
+<form action="/tcp_test/" method="POST">
+  <button type="submit" name="TCP_test">TCP Test</button> 
+</form>
+
+<form action="/sensor_test/" method="POST">
+  <button type="submit" name="Sensor_test">Sensor Test</button> 
+</form>
+
+<form action="/motor_test/" method="POST">
+  <button type="submit" name="Motor_test">Motor Test</button>   
+</form>
+
+
 {% endblock %}
 
 {% block footer %}

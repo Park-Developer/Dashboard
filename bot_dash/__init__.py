@@ -1,9 +1,10 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 
 
 def create_app(test_config=None): # Application 및 blueprint 등록 함수
     # create and configure the app
+    print("create app!")
     app = Flask(__name__,instance_relative_config=True)
     app.config.from_mapping(
             SECRET_KEY='dev',
@@ -24,11 +25,6 @@ def create_app(test_config=None): # Application 및 blueprint 등록 함수
     except OSError:
         pass
 
-    
-    @app.route('/')
-    def index_setting(): # index화면 구성 함수
-        return render_template('index.html')
-
     from . import db
     db.init_app(app)
 
@@ -45,6 +41,11 @@ def create_app(test_config=None): # Application 및 blueprint 등록 함수
 
     from . import setting
     app.register_blueprint(setting.bp)
+    
+    from . import index
+    app.register_blueprint(index.bp)
+
+
     return app
 
     
