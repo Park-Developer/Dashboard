@@ -48,7 +48,4 @@ def create_app(test_config=None): # Application 및 blueprint 등록 함수
 
     return app
 
-    
 
-
-            

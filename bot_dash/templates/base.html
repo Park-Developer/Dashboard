@@ -4,12 +4,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
   <h1>Monitoring Dashboard</h1>
-
+  {# a comment #}
   <ul class="nav_lists">
+    <li><a href="/">Home</a> 
+      
     <li><a href="Setting/setting_index">Setting</a> 
     <li><a href="Control/control_index">Control</a> 
     <li><a href="Monitoring/monitoring_index">Monitoring</a>
-    <li><a href="Guide/guide_index">Monitoring</a>
     <li><a href="dashboard/monitoring">Dashboard</a> <!--RUL 변경 필-->
   </ul>
   
@@ -22,12 +23,16 @@
     {% endblock %}
   </header>
   <body>
+    
     {% block content %}
     
     {% endblock %}
+
     {% block footer %}
     <p>this is footer</p>
     {% endblock %}
-  <script></script>
+  <script>
+
+  </script>
   </body>
 </section>

@@ -13,21 +13,81 @@
 
 <h3>Test</h3>
 
-<form action="/tcp_test/" method="POST">
-  <button type="submit" name="TCP_test">TCP Test</button> 
-</form>
+<div class="index_Test" style="display:flex">
+  <!-- [Setting Part] -->
+  <div class="index_Test__setting" style="width:50%" >
+    <h3 class="setting_header">Test Setting</h3>
 
-<form action="/sensor_test/" method="POST">
-  <button type="submit" name="Sensor_test">Sensor Test</button> 
-</form>
+      <button class="index__tcp_btn" type="submit" name="TCP_test" >TCP Test</button> 
+      <button class="index__sensor_btn" type="submit" name="Sensor_test" onclick="sensor_Btn_click()">Sensor Test</button> 
+      <button class="index__motor_btn" type="submit" name="Motor_test" onclick="motor_Btn_click()">Motor Test</button>   
+      <button class="index__camera_btn" type="submit" name="Camera_test" onclick="camera_Btn_click()">Camera Test</button>   
 
-<form action="/motor_test/" method="POST">
-  <button type="submit" name="Motor_test">Motor Test</button>   
-</form>
+  </div>
 
+  <!-- [Display Part] -->
+  <div class="index_Test__status" style="width:50%">
+    <h3 class="status_header">Test Status</h3>
+    
+    <div class="test_type">
+      <span>Test : </span>
+      <span class="test_type__selection">No selected</span>
+    </div>
+    
+  </div>
+</div>
 
 {% endblock %}
 
+
+
 {% block footer %}
 {{ super() }}
+<script>
+// Button DOM Setting
+document.querySelector(".index__tcp_btn").addEventListener("click",tcp_Btn_click);
+document.querySelector(".index__sensor_btn").addEventListener("click",sensor_Btn_click);
+document.querySelector(".index__motor_btn").addEventListener("click",motor_Btn_click);
+document.querySelector(".index__camera_btn").addEventListener("click",camera_Btn_click);
+
+function tcp_Btn_click(){
+
+console.log("tcp_test button click");
+  const URL = '/tcp_test/';
+  const xhr = new XMLHttpRequest();
+  let sender = "asd";
+  let postObj = { 
+      id: 1, 
+      title: "What is AJAX", 
+      body: "AJAX stands for Asynchronous JavaScript..."
+  }
+  let post = JSON.stringify(postObj)
+
+  xhr.open('POST', URL,true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.send(post);
+};
+
+function sensor_Btn_click(){
+  console.log("sensor_test button click");
+  const URL = '/sensor_test/';
+  const xhr = new XMLHttpRequest();
+  let sender = "asd";
+  let postObj = { 
+      id: 2, 
+      title: "What is sadAJAX", 
+      body: "AJAX stands for Asynchronous JavaScript..."
+  }
+  let post = JSON.stringify(postObj)
+
+  xhr.open('POST', URL,true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.send(post);
+
+};
+function motor_Btn_click(){};
+function camera_Btn_click(){};
+
+
+</script>
 {% endblock %}
