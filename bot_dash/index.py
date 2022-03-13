@@ -8,8 +8,9 @@ bp = Blueprint('index', __name__)
 @bp.route('/')
 def index_setting(): # index화면 구성 함수
 
-    return render_template('index.html')
-
+    #return render_template('index.html')
+    hidden_status=False
+    return render_template('index.html',hidden_status=hidden_status)
 def tcp_test():
     print("tcp_test")
     # IP 주소 입력받고 연결 확인
@@ -47,4 +48,14 @@ def index_btn_click(index_button): # index화면 구성 함수
         motor_test()
     
     #return redirect("/")#(request.url)
-    return render_template('index.html',index_button=index_button)
+    hidden_status=True
+    return render_template('index.html',hidden_status=hidden_status)
+
+@bp.route('/selected_test/<test>/',methods=['POST'])
+def display_test_setting(test): # index화면 구성 함수
+    if test=="tcp":
+        print("asdasdasd")
+        print("selected test is tcp : ")
+        hidden_status=False
+    return render_template('index.html',hidden_status=hidden_status)
+
