@@ -10,7 +10,165 @@
 {% endblock %}
 {% block content %}
 <h1> Setting index test</h1>
+<div class="Setting_Information">
+  <p>Control is possible only when all communication connections are made.</p>
+  <label for="setting_status">Setting Progress : </label>
+  <progress class="setting_progress" id="setting_status" value="92" max="100"> 99% </progress>
+</div>
 
+<div class="Setting" style="display:flex">
+<div class="Setting_Input_Block" style="width:30%">
+  <h3 class="User_Setting__header">User Information</h3>
+
+  <div class="User_Setting" style="display:flex">
+    <div class="User_Icon">
+      <img src="{{ url_for('static',filename='User.png') }}/" alt="My Image">
+    </div> <!-- User_Icon End -->
+
+    <div class="User_Information">
+      <div class="setting_user__name">
+        <span > User ID : </span>
+        <span class="user_name__value"></span>
+      </div>
+
+      <div class="setting_user__email">  
+        <span > E-mail : </span>
+        <span class="user_name__email"></span>
+      </div>
+
+      {% if is_loginOK %}
+        <form class="user_setting__LogoutBtn" action="/Setting/User/Logout/" method="post">
+          <button class="user_logout__btn" type="submit" name="User_Logout" >Logout</button> 
+        </form>
+      {% else %}
+        {% if is_user_empty %} <!--User DB 데이터가 없는 경우-->
+          <form class="user_setting__regBtn" action="/Setting/User/Register/" method="post">
+            <button class="user_register__btn" type="submit" name="User_Register" >Register</button> 
+          </form>
+        {% else %}             <!--User DB 데이터가 있는 경우-->
+          <form class="user_setting__LoginBtn" action="/Setting/User/Login/" method="post">
+            <button class="user_login__btn" type="submit" name="User_Login" >Login</button> 
+          </form>
+        {% endif %}
+      {% endif %}
+    </div> <!-- User_Information End -->
+  </div> <!--User_Setting End-->
+
+  <h3 class="Communication_Setting__header">Communication Information</h3>
+  <div class="Communi_Setting">
+    <form action="/Setting/Communication/Com1/" method="post">
+      <div style="display:flex">
+        <label for="setting__ip1">COM1 IP </label>
+        <input type="text" id="input__ip1" name="ip1">
+      </div>
+      <div style="display:flex">
+        <input type="submit" value="Connect">
+        <input type="submit" value="Cancel">
+      </div>
+    </form>
+
+    <form action="/Setting/Communication/Com2/" method="post">
+      <div style="display:flex">
+        <label for="setting__ip2">COM2 IP </label>
+        <input type="text" id="input__ip2" name="ip2">
+      </div>
+      <div style="display:flex">
+        <input type="submit" value="Connect">
+        <input type="submit" value="Cancel">
+      </div>
+    </form>
+  </div>
+</div> <!--Setting Input Block End -->
+
+<div class="Setting_Display_Block" style="width:70%">
+
+  <h3 class="setting_display__header">Setting Log</h3>
+  <textarea readonly id="setting_display" name="setting_display" rows="10" cols="50">
+    Hello!
+  </textarea>
+</div> <!--Setting Display Block End -->
+</div>
+
+<script>
+  //let login= {{is_loginOK}};
+// html render될때마다 변수 확인
+
+
+function check_progress_var(){
+  let progress_ratio=localStorage.getItem("progress_value");
+  if (progress_ratio==null){
+    progress_ratio=0;
+  }else{
+    progress_ratio=Number(progress_ratio)
+  }
+  //[1] Login Status Check (status progress ratio : 40%)
+  let past_is_loginOK=localStorage.getItem("is_loginOK");
+  
+  if ("{{is_loginOK}}"=="True" && past_is_loginOK != "True"){
+    localStorage.setItem("is_loginOK", "True");
+    progress_ratio=progress_ratio+40;
+  }else if ("{{is_loginOK}}"=="False"){
+    localStorage.setItem("is_loginOK", "False");
+    if (past_is_loginOK=="True"){
+      progress_ratio=progress_ratio-40;
+    }
+  }
+   
+
+  //[2] Com1 Connection Check (status progress ratio : 30%)
+  let past_is_connect1=localStorage.getItem("is_connect1");
+
+  if ("{{is_connect1}}"=="True" && past_is_connect1!="True"){
+    localStorage.setItem("is_connect1", "True");
+    progress_ratio=progress_ratio+30;
+  }else if ("{{is_connect1}}"=="False"){
+    localStorage.setItem("is_connect1", "False");
+    if (past_is_connect1=="True"){
+      progress_ratio=progress_ratio-30;
+    }
+  }
+
+
+  //[3] Com2 Connection Check (status progress ratio : 30%)
+  let past_is_connect2=localStorage.getItem("is_connect2");
+
+  if ("{{is_connect2}}"=="True"){
+    localStorage.setItem("is_connect2", "True");
+    progress_ratio=progress_ratio+30;
+  }else if ("{{is_connect2}}"=="False"){
+    localStorage.setItem("is_connect2", "False");
+    if (past_is_connect2=="True"){
+      progress_ratio=progress_ratio-30;
+    }
+  }
+  
+  //[4] Progress Bar Value Update
+  document.querySelector(".setting_progress").value=progress_ratio;
+  localStorage.setItem("progress_value", progress_ratio);
+
+  //[5] All condition Check
+  let login_status=localStorage.getItem("is_loginOK");
+  let is_connect1=localStorage.getItem("is_connect1");
+  let is_connect2=localStorage.getItem("is_connect2");
+  
+  if (login_status=="True" && is_connect1=="True" && is_connect2=="True"){
+    console.log("Control is Avaiable!!");
+
+    // local 저장소 데이터 초기화
+    localStorage.removeItem('is_loginOK');
+    localStorage.removeItem('is_connect1');
+    localStorage.removeItem('is_connect2');
+    localStorage.removeItem('progress_value');
+
+  }else{
+    console.log("Control isn't Avaiable!!");
+  }
+}
+
+// function run
+check_progress_var();
+
+</script>
 {% endblock %}
 
 {% block footer %}

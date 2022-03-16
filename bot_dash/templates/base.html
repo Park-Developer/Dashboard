@@ -1,19 +1,21 @@
 <!--flaskr/templates/base.html-->
 <!doctype html>
+<head>
+
+
+
 <title>{% block title %}{% endblock %} - Flaskr</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 <nav>
   <h1>Monitoring Dashboard</h1>
-  {# a comment #}
-  <ul class="nav_lists">
-    <li><a href="/">Home</a> 
-      
-    <li><a href="Setting/setting_index">Setting</a> 
-    <li><a href="Control/control_index">Control</a> 
-    <li><a href="Monitoring/monitoring_index">Monitoring</a>
-    <li><a href="dashboard/monitoring">Dashboard</a> <!--RUL 변경 필-->
-  </ul>
-  
+
+  <input type="button" onclick="location.href='/';" value="Home">
+  <input type="button" onclick="location.href='Setting/setting_index';" value="Setting">
+  <input type="button" onclick="location.href='Control/control_index';" value="Control" disabled >
+  <input type="button" onclick="location.href='Monitoring/monitoring_index';" value="Monitoring" disabled>
+  <input type="button" onclick="location.href='dashboard/monitoring';" value="Dashboard" disabled>
 </nav>
 
 <section class="content">
@@ -22,14 +24,14 @@
     
     {% endblock %}
   </header>
-  <body>
+ 
     
     {% block content %}
     
     {% endblock %}
 
     {% block footer %}
-    <p>this is footer</p>
+    <p style="text-align:right">Wono Dashboard V1.0</p>
     {% endblock %}
   <script>
 
