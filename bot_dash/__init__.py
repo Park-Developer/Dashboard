@@ -14,6 +14,8 @@ migrate=Migrate()
 page_status={
     "login_part":{
         "is_loginOK":False,
+        "User_ID":" ",
+        "User_IP":" ",
     },
 
     "setting_part":{
@@ -74,6 +76,9 @@ def create_app(test_config=None): # Application 및 blueprint 등록 함수
     from . import setting
     app.register_blueprint(setting.bp)
     
+    from . import test
+    app.register_blueprint(test.bp)
+
     from . import index
     app.register_blueprint(index.bp)
 

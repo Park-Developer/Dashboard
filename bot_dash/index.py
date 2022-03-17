@@ -31,35 +31,42 @@ def setting_index():
     return render_template('index.html',is_loginOK=page_status["login_part"]["is_loginOK"],is_user_empty=is_user_empty,user_db_data=user_db_data)
     
 
-def click_register_Btn():
-    print("register btn click!")
 
-    is_loginOK=True # 일단 모든 조건 True로 설정
-    return is_loginOK
-
-def click_login_Btn():
+def click_login_Btn(): #is_loginOK=True # 데모용 모든 조건 True로 설정
     print("login btn click!")
-    print("url_for inde",url_for('index.setting_index'))
-    #is_loginOK=True # 일단 모든 조건 True로 설정
+    print("url_for inde",request.get_data())
+    recv_data=request.get_data().decode('ascii')
+    tmp=recv_data.split("&")
+    
+    user_id=tmp[0].split("=")[1]
+    user_ip=tmp[1].split("=")[1]
+
+    # 전역 변수 저장
     page_status["login_part"]["is_loginOK"]=True
-    return page_status["login_part"]["is_loginOK"]
+    page_status["login_part"]["User_ID"]=user_id
+    page_status["login_part"]["User_IP"]=user_ip
+
+    return True, user_id, user_ip
 
 def click_logout_Btn():
     print("logout btn click!")
 
     page_status["login_part"]["is_loginOK"]=False # 일단 모든 조건 True로 설정
-    return page_status["login_part"]["is_loginOK"]
+    page_status["login_part"]["User_ID"]=""
+    page_status["login_part"]["User_IP"]=""
+    user_id=""
+    user_ip=""
+    
+    return False, user_id, user_ip
 
 @bp.route("/User/<user_btn>/",methods=['POST'])
 def click_user_btn(user_btn):
-    if user_btn=="Register":
-        is_loginOK=click_register_Btn()
-    elif user_btn=="Login":
-        is_loginOK=click_login_Btn()
+    if user_btn=="Login":
+        is_loginOK,user_id, user_ip=click_login_Btn()
     elif user_btn=="Logout":
-        is_loginOK=click_logout_Btn()
-
+        is_loginOK,user_id, user_ip=click_logout_Btn()
+      
     #response=make_response(render_template('index.html',is_loginOK=is_loginOK))
     #response.mimetype="text/html"
-    return render_template('index.html',is_loginOK=is_loginOK)
+    return render_template('index.html',is_loginOK=is_loginOK,user_id=user_id, user_ip=user_ip)
     #return redirect(location=url_for('index.setting_index'),code=302,Response=response)

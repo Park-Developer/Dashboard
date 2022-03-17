@@ -18,40 +18,38 @@
 
 
     {% if is_loginOK %}
-    <div class="login_user__name" style="display:flex">
-     <span> User ID : </span>
-     <span> Master </span>
-    </div>
+      <div class="login_user__name" style="display:flex">
+      <span> User ID : {{user_id}}</span>
 
-    <div class="login_user__email" style="display:flex">  
-      <span> Emaii : </span>
-      <span> parkwonho94@gmail.com </span>
-    </div>
+      </div>
 
-    <form class="user_setting__LogoutBtn" action="/User/Logout/" method="post" onclick="logout_click()">
-      <button class="user_logout__btn" type="submit" name="User_Logout" >Logout</button> 
-    </form>
+      <div class="login_user__email" style="display:flex">  
+        <span> Emaii : {{user_ip}}</span>
+      
+      </div>
+
+      <form class="user_setting__LogoutBtn" action="/User/Logout/" method="post" onclick="logout_click()">
+        <button class="user_logout__btn" type="submit" name="User_Logout" onclick="logout_click()">Logout</button> 
+      </form>
     {% else %}
-    <div class="setting_user__name">
-      <label for="user_id"> User ID : </label>
-      <input type="text" id="user_id" name="user_id">
-    </div>
 
-    <div class="setting_user__email">  
-      <label for="user_pw"> User PW : </label>
-      <input type="text" id="user_pw" name="user_pw">
-    </div>
+      <div>
+        <form class="user_setting__LoginBtn" action="/User/Login/" method="post">
+          <div class="setting_user__name">
+            <label for="user_id"> User ID : </label>
+            <input type="text" id="user_id" name="user_id">
+          </div>
+      
+          <div class="setting_user__ip">  
+            <label for="user_pw"> User IP : </label>
+            <input type="text" id="user_ip" name="user_ip">
+          </div>
+      
 
-    <div style="display:flex">
-      <form class="user_setting__LoginBtn" action="/User/Login/" method="post" onclick="login_click()">
-        <button class="user_login__btn" type="submit" name="User_Login" >Login</button> 
-      </form>
+          <button class="user_login__btn" type="submit" name="User_Login" onclick="login_click()">Login</button> 
+        </form>
+      </div>
 
-      <form class="user_setting__regBtn" action="/User/Register/" method="post">
-        <button class="user_register__btn" type="submit" name="User_Register" >Register</button> 
-      </form>
-    
-    </div>
     {% endif %}
   </div> <!-- User_Information End -->
 </div> <!--User_Setting End-->
