@@ -1,8 +1,12 @@
+from os import truncate
+from re import T
+from syslog import LOG_NOTICE
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from werkzeug.exceptions import abort
 import sqlite3
+from bot_dash import page_status  
 
 bp = Blueprint('setting', __name__)
 
@@ -59,22 +63,55 @@ def click_user_btn(user_btn):
     return render_template('Setting/setting_index.html',is_loginOK=is_loginOK)
 
 def click_com1():
-    is_connect1=True
-    return is_connect1
+    print("INPUT IP1",request.get_data().decode('ascii'))
+    recv_data=request.get_data().decode('ascii')
+    tmp=recv_data.split("=")
+    input_ip1=tmp[1]
+    
+    #
+    #Check Logic
+    #
+    
+    # IF IP is Available
+    page_status["setting_part"]["Com1_ip"]=input_ip1
+    page_status["setting_part"]["is_Com1_conOK"]=True
+
+    return True, input_ip1
 
 def click_com2():
-    is_connect2=True
-    return is_connect2
+    print("INPUT IP2",request.get_data().decode('ascii'))
+    recv_data=request.get_data().decode('ascii')
+    tmp=recv_data.split("=")
+    input_ip2=tmp[1]
     
+    #
+    #Check Logic
+    #
 
-@bp.route("/Setting/Communication/<Com>/",methods=['POST'])
-def click_communication_btn(Com):
-    if Com=="Com1":
-        is_connect1=click_com1()
-        return render_template('Setting/setting_index.html',is_connect1=is_connect1)
-    elif Com=="Com2":
-        is_connect2=click_com2()
-        return render_template('Setting/setting_index.html',is_connect2=is_connect2)
+    # IF IP is Available
+    page_status["setting_part"]["Com2_ip"]=input_ip2
+    page_status["setting_part"]["is_Com2_conOK"]=True
 
+    return True, input_ip2
+
+@bp.route("/Setting/Communication/<Com_button>/",methods=['POST'])
+def click_communication_btn(Com_button):
+    # < COM1 URL Handling >
+    if Com_button=="Com1_connect":
+        is_connect1,input_ip1=click_com1()
+        print("gg",input_ip1)
+        return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1)
+    elif Com_button=="Com1_disconnect":
+        return render_template('Setting/setting_index.html',is_connect1=False)
+    
+    # < COM2 URL Handling >
+    elif Com_button=="Com2_connect":
+        is_connect2,input_ip2=click_com2()
+        return render_template('Setting/setting_index.html',is_connect2=is_connect2,input_ip2=input_ip2)
+    elif Com_button=="Com2_disconnect":
+        return render_template('Setting/setting_index.html',is_connect2=False)
+
+    else:
+        return redirect("/")
 
     

@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect
 import datetime
+
 # 2022.03.15. 작업
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +10,19 @@ import config
 
 db=SQLAlchemy()
 migrate=Migrate()
+
+page_status={
+    "login_part":{
+        "is_loginOK":False,
+    },
+
+    "setting_part":{
+        "is_Com1_conOK":False, # Com1 통신 연결 유무
+        "is_Com2_conOK":False, # Com2 통신 연결 유무
+        "Com1_ip":" ",
+        "Com2_ip":" ",
+    }
+}
 
 def create_app(test_config=None): # Application 및 blueprint 등록 함수
     # create and configure the app
