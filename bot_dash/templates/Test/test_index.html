@@ -23,17 +23,10 @@
             <button class="index__tcp_btn" type="submit" name="TCP_test" >TCP Test</button> 
           </form>
   
-          <form class="index__sensor_form" action="/Test/sensor_test/" method="post">
-            <button class="index__sensor_btn" type="submit" name="Sensor_test" onclick="sensor_Btn_click()">Sensor Test</button> 
-          </form>
-  
           <form class="index__motor_form" action="/Test/motor_test/" method="post">
             <button class="index__motor_btn" type="submit" name="Motor_test" onclick="motor_Btn_click()">Motor Test</button>   
           </form>
-  
-          <form class="index__camera_form" action="/Test/camera_test/" method="post">
-            <button class="index__camera_btn" type="submit" name="Camera_test" onclick="camera_Btn_click()">Camera Test</button>   
-          </form>
+
       </div>
     </div>
   
@@ -68,8 +61,69 @@
     </div>
     {% endif %}
 
-{% elif selected_test=="sensor" %}
 {% elif selected_test=="motor" %}
+<div class="Motor_Test_Part" style="display:flex">
+
+<div class="Motor_Test_Control"  style="width:30%">
+  <div class="Motor_power">
+    <label>Motor Power</label>
+
+    <label class="switch">
+      <input type="checkbox">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <!--Motor Contril Part-->
+  <div class="Motor_control">
+    <label>Motor Control</label>
+    <form action="/Test/selected_test/motor/control" method="post" onclick="click_motorCtrl_btn(event)">
+      <!--Forward Button-->
+      {% if selected_direction=="Forward" %}
+      <input class="motor_ctrl_fw" style="background-color:lawngreen;" type="submit" value="Forward" formaction="/Test/selected_test/motor/control/Forward/">
+      {% else %}
+      <input class="motor_ctrl_fw" type="submit" value="Forward" formaction="/Test/selected_test/motor/control/Forward/">
+      {% endif %}
+      
+      <!--Right Button-->
+      {% if selected_direction=="Right" %}
+      <input class="motor_ctrl_ri" style="background-color:lawngreen;" type="submit" value="Right" formaction="/Test/selected_test/motor/control/Right/">
+      {% else %}
+      <input class="motor_ctrl_ri" type="submit" value="Right" formaction="/Test/selected_test/motor/control/Right/">
+      {% endif %}
+
+      <!--Left Button-->
+      {% if selected_direction=="Left" %}
+      <input class="motor_ctrl_le" style="background-color:lawngreen;" type="submit" value="Left" formaction="/Test/selected_test/motor/control/Left/">
+      {% else %}
+      <input class="motor_ctrl_le" type="submit" value="Left" formaction="/Test/selected_test/motor/control/Left/">
+      {% endif %}
+
+      <!--Backward Button-->
+      {% if selected_direction=="Backward" %}
+      <input class="motor_ctrl_ba" style="background-color:lawngreen;" type="submit" value="Backward" formaction="/Test/selected_test/motor/control/Backward/">
+      {% else %}
+      <input class="motor_ctrl_ba" type="submit" value="Backward" formaction="/Test/selected_test/motor/control/Backward/">
+      {% endif %}
+
+      <!--Stop Button-->
+      {% if selected_direction=="Stop" %}
+      <input class="motor_ctrl_st" style="background-color:lawngreen;" type="submit" value="Stop" formaction="/Test/selected_test/motor/control/Stop/">
+      {% else %}
+      <input class="motor_ctrl_st" type="submit" value="Stop" formaction="/Test/selected_test/motor/control/Stop/">
+      {% endif %}
+
+    </form>
+  </div>
+</div> <!-- Motor_Test_Display End -->
+
+<div class="Motor_Status_Display"  style="width:70%">
+  <textarea readonly id="setting_display" name="setting_display" rows="10" cols="50">
+    Motor is off
+  </textarea>
+</div> <!-- Motor_Status_Display End --> 
+
+</div>
+
 {% elif selected_test=="camera" %} 
 <div class="col-lg-8  offset-lg-2">
     <h3 class="mt-5">Live Streaming</h3>
@@ -162,10 +216,26 @@
     }
     // - Class Definition End - 
     
+    // Motor setting
+    function click_motorCtrl_btn(event){
+      console.log("motor c",event.target.value)
+      if (event.target.value=="Forward"){
+        document.querySelector(".motor_ctrl_fw").style.color="red";
+      }else if(event.target.value=="Right"){
+        document.querySelector(".motor_ctrl_ri").style.color="red";
+      }else if(event.target.value=="Left"){
+        document.querySelector(".motor_ctrl_le").style.color="red";
+      }else if(event.target.value=="Backward"){
+        document.querySelector(".motor_ctrl_ba").style.color="red";
+      }else if(event.target.value=="Stop"){
+        document.querySelector(".motor_ctrl_st").style.color="red";
+      }
+    }
     
     
     function init_setting(){
       let test_clas=new Index_Btn(); // Button Class Obj
+      console.log('{{selected_direction}}');
     };
     
     init_setting(); // class run

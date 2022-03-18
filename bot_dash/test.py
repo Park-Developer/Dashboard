@@ -38,29 +38,48 @@ def camera_test():
 
 
 def gen_frames():  # generate frame by frame from camera
-    context = zmq.Context()
-    footage_socket = context.socket(zmq.SUB)
-    footage_socket.bind('tcp://192.168.219.100:5555')
-    footage_socket.setsockopt_string(zmq.SUBSCRIBE, np.unicode(''))
+    # Mode Decision
+    self_mode=False
 
-    while True:
-        try:
-            frame = footage_socket.recv_string()
-            img = base64.b64decode(frame)
-            npimg = np.fromstring(img, dtype=np.uint8)
-            source = cv2.imdecode(npimg, 1)
-            ret, buffer = cv2.imencode('.jpg', source)
-          
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
+    if self_mode==True:
+        camera = cv2.VideoCapture(0)
+        while True:
+            # Capture frame-by-frame
+            success, frame = camera.read()  # read the camera frame
+            if not success:
+                break
+            else:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
-        except:
-            print("Camera Stream Error!!")
-            break
+    else:
+        context = zmq.Context()
+        footage_socket = context.socket(zmq.SUB)
+        footage_socket.bind('tcp://192.168.219.152:5555')
+        footage_socket.setsockopt_string(zmq.SUBSCRIBE, np.unicode(''))
 
+        while True:
+            print("camera loading")
+            try:
+                frame1 = footage_socket.recv_string()
+                print(frame)
+                img = base64.b64decode(frame1)
+                npimg = np.fromstring(img, dtype=np.uint8)
+                frame = cv2.imdecode(npimg, 1)
+                ###
+                #cv2.imshow("Stream", source)
+                #cv2.waitKey(1)
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # conat f
 
-
+            except:
+                print("Err!")
+                cv2.destroyAllWindows()
+                break
 
 
 @bp.route('/Test/Camera/video_stream/')
@@ -79,15 +98,9 @@ def index_btn_click(index_button): # index화면 구성 함수
        
         tcp_test()
         selected_test="communication"
-    elif index_button=="sensor_test":
-        sensor_test()
-        selected_test="sensor"
     elif index_button=="motor_test":
         selected_test="motor"
         motor_test()
-    elif index_button=="camera_test":
-        camera_test()
-        selected_test="camera"
     else:
         selected_test="None"
     #return redirect("/")#(request.url)
@@ -107,3 +120,10 @@ def display_test_setting(select_test): # index화면 구성 함수
         is_commu_connect=False
     return render_template('/Test/test_index.html',is_commu_connect=is_commu_connect,User_IP=page_status["login_part"]["User_IP"])
 
+
+# Motor Test Display
+@bp.route('/Test/selected_test/motor/control/<direction>/',methods=['POST'])
+def motor_ctrl(direction):
+    selected_test="motor"
+    selected_direction=direction
+    return render_template('/Test/test_index.html',selected_direction=selected_direction,selected_test=selected_test,User_IP=page_status["login_part"]["User_IP"])
