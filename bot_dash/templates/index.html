@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Setting{% endblock %}
+{% block title %}Home{% endblock %}
 {% block head %}
   {{ super() }}
   <!--<style type="text/css">
@@ -9,6 +9,8 @@
   -->
 {% endblock %}
 {% block content %}
+<h1>Home</h1>
+
 <div class="User_Setting" style="display:flex">
   <div class="User_Icon">
     <img src="{{ url_for('static',filename='User.png') }}/" alt="My Image">

@@ -1,142 +1,151 @@
-<!--flaskr/templates/base.html-->
-<!doctype html>
-<html lang="en">
-<head>
-        <!-- Required meta tags -->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Dashboard</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<nav>
-  <h1>Robot Dashboard</h1>
+{% extends 'base.html' %}
 
-</nav>
+{% block title %}Monitoring{% endblock %}
 
-</head>
+{% block head %}
+  {{ super() }}
+{% endblock %}
 
-<body>
-    <section class="Control_Part">
-        <span class="Control_Part__title">Robot Mode</span>
-        <button type="button">Auto Mode</button> 
-        <button type="button">Manual Mode</button>
-    </section>
+{% block content %}
+<h1>Monitoring</h1>
+
+<section class="Control_Part">
+  <span class="Control_Part__title">Monitoring Status</span>
+
+  {% if monitoring_status=="start" %}
+      <input class="Monitoring_stop_btn" value="stop" type="submit" name="Monitoring_stop" onclick="btn_event.monitoring_stop_Btn_click()"> 
+  {% else %}
+      <input class="Monitoring_start_btn" value="start" type="submit" name="Monitoring_start" onclick="btn_event.monitoring_start_Btn_click()">  
+  {% endif %}
+
+</section>
     
     
-    <section class="Dynamic_View">
-        <div class="Dynamic_View__nav">
-        <span class="dynamic_view__title">Robot View</span>
+<section class="Dynamic_View">
+<div class="Dynamic_View__nav">
+  <h3 class="dynamic_view__title">1. Robot View</h3>
+</div>
+    
+<div class="dynamic_view">
+  <div class="Robot_Camera container" style="width:50%">
+    {% if monitoring_status=="start" %}
+      <div class="camera_available_view">
+        <div class="col-lg-8  offset-lg-2">
+          <h3 class="mt-5">Camera View</h3>
+          <!--<img src="{{ url_for('dashboard.video_feed') }}" width="100%">-->
         </div>
+      </div>
+    {% else %}
+      <div class="camera_Unavailable_view">
+        <p>No Camera View</p>
+      </div>
+    {% endif %}
+  </div>
     
-        <div class="dynamic_view">
+  <div class="Robot_Bound" style="width:50%">
+    {% if monitoring_status=="start" %}
+      <div class="Robot_Bound__Display">
+        <h3>Robot Bound</h3>
+        <img src="{{ url_for('dashboard.ani_png') }}" width="100%">
+      </div>
+    {% else %}
+      <div class="Around_Unavailable_view">
+        <p>No Around View</p>
+      </div>
+  {% endif %}
+  </div>
+</div> <!-- dynamic_view End -->
+</section>
     
-            <div class="Robot_Camera container">
-                <div class="row">
-                    <div class="col-lg-8  offset-lg-2">
-                        <h3 class="mt-5">Camera View</h3>
-                        <img src="{{ url_for('dashboard.camera_run') }}" width="100%">
-                    </div>
-                </div>
-            </div>
-    
-            <div class="Robot_Bound">
-                <div class="Robot_Bound__Display">
-                    <h3>Robot Bound</h3>
-                    <img src="{{ url_for('dashboard.ani_png') }}" width="100%">
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    
-    <section class="Sensor_Info">
-        <div class="Sensor_Info_nav">
-          <h3 class="dynamic_view__title">Sensor Data</h3>
-        </div>
+<section class="Sensor_Info">
+  <div class="Sensor_Info_nav">
+    <h3 class="dynamic_view__title">2. Sensor Data</h3>
+  </div>
         
-        <div class="Sensor_Data" display:flex>
-          <!--PART1 : Current State-->
-          <div class="Sensor_Data_CurrentState" width="30%">
-            <h3 class="CurrentState__title" style="text-align:center">Current State</h3>
-            <div class="Servo_Motor">
-                <span class="Servo__title">Servo Data : </span>
-                <span class="Servo__data">None</span>
-            </div>
+  <div class="Sensor_Data" style="display:flex">
+  <!--PART1 : Current State-->
+  <div class="Sensor_Data_CurrentState" width="30%">
+    <h3 class="CurrentState__title" style="text-align:center">Current State</h3>
     
-            <div class="IR_Sensor">
-                <span class="IR__title">IR Data : </span>
-                <span class="IR__data">None</span>
-            </div>
+    <div class="Servo_Motor">
+      <span class="Servo__title">Servo Data : </span>
+      <span class="Servo__data">None</span>
+    </div>
+    
+    <div class="IR_Sensor">
+      <span class="IR__title">IR Data : </span>
+      <span class="IR__data">None</span>
+    </div>
             
-            <div class="Encoder1">
-                <span class=Encoder1__title>Encoder1 Data : </span>
-                <span class=Encoder1__data>None</span>
-            </div>
+    <div class="Encoder1">
+      <span class=Encoder1__title>Encoder1 Data : </span>
+      <span class=Encoder1__data>None</span>
+    </div>
     
-            <div class="Encoder2">
-                <span class=Encoder2__title>Encoder2 Data : </span>
-                <span class=Encoder2__data>None</span>
-            </div>
+    <div class="Encoder2">
+      <span class=Encoder2__title>Encoder2 Data : </span>
+      <span class=Encoder2__data>None</span>
+    </div>
     
-            <div class="Ultrasonic_Sensor1">
-                <span class=Ultra1__title>Ultra1 Data : </span>
-                <span class=Ultra1__data></span>
-            </div>
+    <div class="Ultrasonic_Sensor1">
+      <span class=Ultra1__title>Ultra1 Data : </span>
+      <span class=Ultra1__data></span>
+    </div>
             
-            <div class="Ultrasonic_Sensor2">
-                <span class=Ultra2__title>Ultra2 Data : </span>
-                <span class=Ultra2__data>None</span>
-            </div>
+    <div class="Ultrasonic_Sensor2">
+      <span class=Ultra2__title>Ultra2 Data : </span>
+      <span class=Ultra2__data>None</span>
+    </div>
     
-            <div class="Gyro_Sensor">
-                <span class=Gyro__title>Gyro Data : </span>
-                <span id="test" class=Gyro__data></span>
-            </div>   
-          </div>
+    <div class="Gyro_Sensor">
+      <span class=Gyro__title>Gyro Data : </span>
+      <span id="test" class=Gyro__data></span>
+    </div>   
+  </div>
           
-          <!--PART2 : Time Log-->
-          <div class="Sensor_Data_Log" width="70%">
-            <h3 class="Sensor_Data_Log_title" style="text-align:center">Data Log</h3>
-            <div class="Sensor_Data__motion">
-                <div>
-                <canvas id="Encoder1_chart"  height="250"></canvas>  
-                </div>
+  <!--PART2 : Time Log-->
+  <div class="Sensor_Data_Log" width="70%">
+    <h3 class="Sensor_Data_Log_title" style="text-align:center">Data Log</h3>
+    <div class="Sensor_Data__motion">
+      <div>
+      <canvas id="Encoder1_chart"  height="250"></canvas>  
+      </div>
 
-                <div>
-                <canvas id="Encoder2_chart"  height="250"></canvas>
-                </div>
+      <div>
+      <canvas id="Encoder2_chart"  height="250"></canvas>
+      </div>
 
-                <div>
-                <canvas id="Gyro_chart"  height="250"></canvas>
-                </div>
-            </div>
-            <div class="Sensor_Data__detection">
-                <div>
-                <canvas id="Servo_chart" height="250"></canvas>
-                </div>
+      <div>
+      <canvas id="Gyro_chart"  height="250"></canvas>
+      </div>
+      
+    </div> <!-- Sensor_Data__motion End -->
 
-                <div>
-                <canvas id="IR_chart"  height="250"></canvas>
-                </div>
+    <div class="Sensor_Data__detection">
+      <div>
+      <canvas id="Servo_chart" height="250"></canvas>
+      </div>
 
-                <div>
-                <canvas id="Ultra1_chart" height="250"></canvas>
-                </div>
+      <div>
+      <canvas id="IR_chart"  height="250"></canvas>
+      </div>
 
-                <div>
-                <canvas id="Ultra2_chart"  height="250"></canvas>
-                </div>
-            </div>
+      <div>
+      <canvas id="Ultra1_chart" height="250"></canvas>
+      </div>
+
+      <div>
+      <canvas id="Ultra2_chart"  height="250"></canvas>
+      </div>
+    </div> <!-- Sensor_Data__detection End -->
             
-          </div>
-        </div>
-        </section>
+  </div> <!-- Sensor_Data_Log End -->
+  </div> <!-- ensor_Data End -->
+</section>
     
-
- 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>  
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>  
-    
-    <script>
+<script>
     const SENSOR_INFO={
   "sensor_data_number":7,
 
@@ -408,36 +417,43 @@ function read_sensor_Data(sensor_info, recv_data){
 
 var latest = document.querySelector('.log_data3');
 
+/*
 var xhr = new XMLHttpRequest();
-xhr.open('GET', "{{ url_for('dashboard.read_sensor') }}");
+xhr.open('GET', "{{ url_for('dashboard.read_sensor') }}"); //  /sensor_monitor
 
 xhr.onreadystatechange = function() {
-    /*
-    var all_lines = xhr.responseText.split('#'); // delimiter
-    var last_line = all_lines.length - 2;
-    latest.textContent = all_lines[last_line];
-    console.log(all_lines[last_line]);
-    //console.log(last_line);
-    console.log(all_lines);
 
-    latest.innerHTML=  latest.textContent;
-    */
     read_sensor_Data(SENSOR_INFO, xhr.responseText); // chart update
 
     if (xhr.readyState == XMLHttpRequest.DONE) {
-        /*alert("The End of Stream");*/
+
         latest.textContent = "The End of Stream";
     }
 }
 
-xhr.send();
+xhr.send(); 
+
+*/
+let btn_event={
+  monitoring_start_Btn_click:function(){
+    console.log("Monitoring Start!!");
+    location.href='/Dashboard/dashboard_index/start/';
+  },
+
+  monitoring_stop_Btn_click:function(){
+    console.log("Monitoring Stop!!");
+    location.href='/Dashboard/dashboard_index/stop/';
+  }
+}
 
 
 
-    </script>
+</script>
+        
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+{% endblock %}
     
     
-    </body>
-
-
-</html>

@@ -3,7 +3,9 @@ from re import A
 from flask import Flask, render_template, Response, render_template_string
 import cv2
 import socket
-
+import zmq
+import base64
+import numpy as np
 # for map
 import io
 import random
@@ -29,29 +31,84 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from bot_dash.db import get_db
 
-bp=Blueprint('dashboard', __name__,url_prefix='/dashboard')
+bp=Blueprint('dashboard', __name__)
+#/Dashboard/monitoring/start/
 
-@bp.route('/monitoring')
+
+@bp.route('/Dashboard/dashboard_index')
 def monitoring(): 
+
     return render_template('dashboard/dashboard.html')
 
-def gen_frames():  # generate frame by frame from camera
-    camera = cv2.VideoCapture(0)  # use 0 for web camera
-    while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+@bp.route('/Dashboard/dashboard_index/start/')
+def monitoring_start():
+    print("Monitoring Start!!")
+    monitoring_status="start"
+    return render_template('dashboard/dashboard.html',monitoring_status=monitoring_status)
 
-@bp.route('/video_feed')
-def camera_run():
+@bp.route('/Dashboard/dashboard_index/stop/')
+def monitoring_stop():
+    print("Monitoring Stop!!")
+    monitoring_status="stop"
+    return render_template('dashboard/dashboard.html',monitoring_status=monitoring_status)
+
+
+
+
+def gen_frames():  # generate frame by frame from camera
+    # Mode Decision
+    self_mode=True
+    print("camera mode" ,self_mode)
+    if self_mode==True:
+        camera = cv2.VideoCapture(0)
+        while True:
+            # Capture frame-by-frame
+            success, frame = camera.read()  # read the camera frame
+            if not success:
+                break
+            else:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
+    else:
+        context = zmq.Context()
+        print("contec" ,  context)
+        footage_socket = context.socket(zmq.SUB)
+        footage_socket.bind('tcp://192.168.219.152:5555')
+        footage_socket.setsockopt_string(zmq.SUBSCRIBE, np.unicode(''))
+
+        while True:
+            print("camera loading")
+            try:
+                frame1 = footage_socket.recv_string()
+                print(frame1)
+                img = base64.b64decode(frame1)
+                npimg = np.fromstring(img, dtype=np.uint8)
+                frame = cv2.imdecode(npimg, 1)
+                ###
+                #cv2.imshow("Stream", source)
+                #cv2.waitKey(1)
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # conat f
+
+            except:
+                print("Err!")
+                cv2.destroyAllWindows()
+                break
+
+
+
+@bp.route('/Dashboard/Camera/video_stream')
+def video_feed():
     #Video streaming route. Put this in the src attribute of an img tag
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
 
 @bp.route('/plot.png')
 def plot_png():
@@ -68,8 +125,8 @@ def create_figure():
     axis.plot(xs, ys)
     return fig
 
-import base64
-@bp.route('/animation.png')
+
+@bp.route('/Dashboard/Robot_view/robot_around')
 def ani_png():
     return Response(create_grpa(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -108,12 +165,12 @@ def create_grpa():
         
         axis.scatter(xs, ys)
         FigureCanvas(fig).print_png(output)
-        print("xs ys ",xs,ys)
+        #print("xs ys ",xs,ys)
         yield (b'--frame\r\n'
                    b'Content-Type: image/png\r\n\r\n' + output.getvalue() + b'\r\n')
 
 
-@bp.route('/sensor_monitor')
+@bp.route('/Dashboard/sensor_monitor')
 def read_sensor():
     '''
     1. UDP 통신을 이용해서 Sensor 데이터 수신(Server)

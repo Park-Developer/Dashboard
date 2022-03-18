@@ -126,4 +126,5 @@ def display_test_setting(select_test): # index화면 구성 함수
 def motor_ctrl(direction):
     selected_test="motor"
     selected_direction=direction
+    
     return render_template('/Test/test_index.html',selected_direction=selected_direction,selected_test=selected_test,User_IP=page_status["login_part"]["User_IP"])

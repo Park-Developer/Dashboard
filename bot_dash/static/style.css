@@ -40,7 +40,7 @@ input[type=submit] { align-self: start; min-width: 10em; }
 }
 
 
-
+/* TEST Page */
 .switch {
     position: relative;
     display: inline-block;
@@ -92,3 +92,24 @@ input[type=submit] { align-self: start; min-width: 10em; }
     transform: translateX(26px);
   }
   
+
+/* Monitoring Page */
+
+.dynamic_view{
+  border-style: solid;
+  border-color: black;
+}
+.Robot_Camera{
+  border-style: solid;
+  border-color: gray;
+}
+
+.Robot_Bound{
+  border-style: solid;
+  border-color: gray;
+}
+
+.Sensor_Data{
+  border-style: solid;
+  border-color: black;
+}
