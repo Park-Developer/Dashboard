@@ -10,6 +10,7 @@
 {% endblock %}
 {% block content %}
 <h1>Setting</h1>
+
 <div class="Setting_Information">
   <p>Control is possible only when all communication connections are made.</p>
   <label for="setting_status">Setting Progress : </label>
@@ -81,7 +82,7 @@
 <div class="Setting_Display_Block" style="width:70%">
 
   <h3 class="setting_display__header">Setting Log</h3>
-  <textarea readonly id="setting_display" name="setting_display" rows="10" cols="50">
+  <textarea class="setting_log" readonly id="setting_display" name="setting_display" rows="10" cols="50">
     Communication settings are required.
   </textarea>
 </div> <!--Setting Display Block End -->
@@ -97,46 +98,41 @@ function check_progress_var(){
   if (progress_ratio==null){
     progress_ratio=0;
   }else{
-    progress_ratio=Number(progress_ratio)
-  }
-  //[1] Login Status Check (status progress ratio : 40%)
-  let past_is_loginOK=localStorage.getItem("is_loginOK");
-  
-  if ("{{is_loginOK}}"=="True" && past_is_loginOK != "True"){
-    localStorage.setItem("is_loginOK", "True");
-    progress_ratio=progress_ratio+40;
-  }else if ("{{is_loginOK}}"=="False"){
-    localStorage.setItem("is_loginOK", "False");
-    if (past_is_loginOK=="True"){
-      progress_ratio=progress_ratio-40;
-    }
-  }
-   
+    progress_ratio=0;
 
-  //[2] Com1 Connection Check (status progress ratio : 30%)
+    if (localStorage.getItem("is_connect1")=="True"){
+      progress_ratio=progress_ratio+50;
+    }
+    if (localStorage.getItem("is_connect2")=="True"){
+      progress_ratio=progress_ratio+50;
+    }
+
+  }
+
+  //[1] Com1 Connection Check (status progress ratio : 30%)
   let past_is_connect1=localStorage.getItem("is_connect1");
 
   if ("{{is_connect1}}"=="True" && past_is_connect1!="True"){
     localStorage.setItem("is_connect1", "True");
-    progress_ratio=progress_ratio+30;
+    progress_ratio=progress_ratio+50;
   }else if ("{{is_connect1}}"=="False"){
     localStorage.setItem("is_connect1", "False");
     if (past_is_connect1=="True"){
-      progress_ratio=progress_ratio-30;
+      progress_ratio=progress_ratio-50;
     }
   }
 
 
-  //[3] Com2 Connection Check (status progress ratio : 30%)
+  //[2] Com2 Connection Check (status progress ratio : 30%)
   let past_is_connect2=localStorage.getItem("is_connect2");
 
   if ("{{is_connect2}}"=="True"){
     localStorage.setItem("is_connect2", "True");
-    progress_ratio=progress_ratio+30;
+    progress_ratio=progress_ratio+50;
   }else if ("{{is_connect2}}"=="False"){
     localStorage.setItem("is_connect2", "False");
     if (past_is_connect2=="True"){
-      progress_ratio=progress_ratio-30;
+      progress_ratio=progress_ratio-50;
     }
   }
   
@@ -145,17 +141,14 @@ function check_progress_var(){
   localStorage.setItem("progress_value", progress_ratio);
 
   //[5] All condition Check
-  let login_status=localStorage.getItem("is_loginOK");
+
   let is_connect1=localStorage.getItem("is_connect1");
   let is_connect2=localStorage.getItem("is_connect2");
   
-  if (login_status=="True" && is_connect1=="True" && is_connect2=="True"){
+  if (is_connect1=="True" && is_connect2=="True"){
     console.log("Control is Avaiable!!");
 
-    // local 저장소 데이터 초기화
-    localStorage.removeItem('is_loginOK');
-    localStorage.removeItem('is_connect1');
-    localStorage.removeItem('is_connect2');
+    // local 저장소 데이터 초기화;
     localStorage.removeItem('progress_value');
 
   }else{
@@ -163,9 +156,41 @@ function check_progress_var(){
   }
 }
 
+function write_settingLog(){
+  let log_data="TCP Connection Log... \n\n";
+
+  if (localStorage.getItem("is_connect1")=="True"){
+    log_data=log_data+"- Com1 is Connected Successfully \n";
+    //document.querySelector(".setting_log").value="COm1 Conn\nected!";
+  }
+
+  if (localStorage.getItem("is_connect2")=="True"){
+    log_data=log_data+"- Com2 is Connected Successfully \n\n";
+    //document.querySelector(".setting_log").value="COm1 Conn\nected!";
+  }
+
+  // Monotoring Condition Check
+  if (localStorage.getItem("is_connect1")=="True" && localStorage.getItem("is_connect2")=="True" ){
+    log_data=log_data+" => You can monitoring robot!"
+  }
+
+  document.querySelector(".setting_log").value=log_data;
+
+}
 // function run
 check_progress_var();
 
+write_settingLog();
+
+/*
+Sends the request. 
+If the request is asynchronous (which is the default),
+this method returns as soon as the request is sent.
+
+
+DONE : The fetch operation is complete. This could mean that either the data transfer has been completed successfully or failed.
+
+*/
 </script>
 {% endblock %}
 

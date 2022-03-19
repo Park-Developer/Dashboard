@@ -15,7 +15,7 @@ page_status={
     "login_part":{
         "is_loginOK":False,
         "User_ID":" ",
-        "User_IP":" ",
+        "Robot_IP":" ",
     },
 
     "setting_part":{
@@ -23,6 +23,12 @@ page_status={
         "is_Com2_conOK":False, # Com2 통신 연결 유무
         "Com1_ip":" ",
         "Com2_ip":" ",
+    },
+    "message":{
+        "TCP_test":{
+            "tcp_connection_request":"Dashboard Setting : TCP Connect Request",
+            "tcp_connection_respond":"Robot : TCP Connection Success",
+        }
     }
 }
 

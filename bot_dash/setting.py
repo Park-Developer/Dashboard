@@ -8,12 +8,14 @@ from werkzeug.exceptions import abort
 import sqlite3
 from bot_dash import page_status  
 
+import socket 
+
 bp = Blueprint('setting', __name__)
 
 @bp.route("/Setting/setting_index") # Setting main
 def setting_index():
-    '''
-    초기 설정 정보는 외부 파일에서 옵로드 하게 하기
+    
+    # N : 초기 설정 정보는 외부 파일에서 옵로드 하게 하기
 
     '''
     # fetching from 'user' table 
@@ -29,8 +31,19 @@ def setting_index():
     
     connect.close()
     is_loginOK=False # login 여부
+    '''
 
-    return render_template('Setting/setting_index.html',is_loginOK=is_loginOK,is_user_empty=is_user_empty,user_db_data=user_db_data)
+    # [Com1 Check]
+    is_connect1=page_status["setting_part"]["is_Com1_conOK"]
+    input_ip1=page_status["setting_part"]["Com1_ip"]
+
+    # [Com2 Check2]
+    is_connect2=page_status["setting_part"]["is_Com2_conOK"]
+    input_ip2=page_status["setting_part"]["Com2_ip"]
+
+ 
+    return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1,
+        is_connect2=is_connect2,input_ip2=input_ip2)
     
 
 def click_register_Btn():
@@ -39,77 +52,94 @@ def click_register_Btn():
     is_loginOK=True # 일단 모든 조건 True로 설정
     return is_loginOK
 
-def click_login_Btn():
-    print("login btn click!")
 
-    is_loginOK=True # 일단 모든 조건 True로 설정
-    return is_loginOK
-
-def click_logout_Btn():
-    print("logout btn click!")
-
-    is_loginOK=False # 일단 모든 조건 True로 설정
-    return is_loginOK
-
-@bp.route("/Setting/User/<user_btn>/",methods=['POST'])
-def click_user_btn(user_btn):
-    if user_btn=="Register":
-        is_loginOK=click_register_Btn()
-    elif user_btn=="Login":
-        is_loginOK=click_login_Btn()
-    elif user_btn=="Logout":
-        is_loginOK=click_logout_Btn()
-
-    return render_template('Setting/setting_index.html',is_loginOK=is_loginOK)
-
-def click_com1():
-    print("INPUT IP1",request.get_data().decode('ascii'))
-    recv_data=request.get_data().decode('ascii')
-    tmp=recv_data.split("=")
-    input_ip1=tmp[1]
+def click_TCP_connect(com_id:int):
+    # Com id Check
+    if (com_id!=1 and com_id!=2):
+        return False, "Unavailable IP"
     
-    #
-    #Check Logic
-    #
-    
-    # IF IP is Available
-    page_status["setting_part"]["Com1_ip"]=input_ip1
-    page_status["setting_part"]["is_Com1_conOK"]=True
+    # IP Check
+    print("COM{com_id} IP : {input_ip}".format(com_id=com_id, input_ip=request.get_data().decode('ascii')))
 
-    return True, input_ip1
+    # TCP Connection
+    try:
+        recv_data=request.get_data().decode('ascii')
+        tmp=recv_data.split("=")
+        input_ip=tmp[1]
 
-def click_com2():
-    print("INPUT IP2",request.get_data().decode('ascii'))
-    recv_data=request.get_data().decode('ascii')
-    tmp=recv_data.split("=")
-    input_ip2=tmp[1]
-    
-    #
-    #Check Logic
-    #
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        sock.connect((input_ip, 9008))
+        sock.send(page_status["message"]["TCP_test"]["tcp_connection_request"].encode()) # 내가 전송할 데이터를 보냄.
 
-    # IF IP is Available
-    page_status["setting_part"]["Com2_ip"]=input_ip2
-    page_status["setting_part"]["is_Com2_conOK"]=True
+        tcp_recv=sock.recv(65535)
+    except Exception as tcp_Err:
+        print('[Setting] TCP Connection Error : ', tcp_Err)
+        return False, "Connection Fail"
 
-    return True, input_ip2
+
+    if (tcp_recv.decode()==page_status["message"]["TCP_test"]["tcp_connection_respond"]): # connection Success
+        if (com_id==1):
+            page_status["setting_part"]["Com1_ip"]=input_ip
+            page_status["setting_part"]["is_Com1_conOK"]=True
+        elif (com_id==2):
+            page_status["setting_part"]["Com2_ip"]=input_ip
+            page_status["setting_part"]["is_Com2_conOK"]=True
+            
+        return True, input_ip
+
+    else: 
+        return False, "Connection Fail"
+
+def click_TCP_disconnect(com_id:int):
+    if (com_id==1):
+        page_status["setting_part"]["Com1_ip"]=""
+        page_status["setting_part"]["is_Com1_conOK"]=""
+    elif (com_id==2):
+        page_status["setting_part"]["Com2_ip"]=""
+        page_status["setting_part"]["is_Com2_conOK"]=""
+
 
 @bp.route("/Setting/Communication/<Com_button>/",methods=['POST'])
 def click_communication_btn(Com_button):
     # < COM1 URL Handling >
     if Com_button=="Com1_connect":
-        is_connect1,input_ip1=click_com1()
-        print("gg",input_ip1)
-        return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1)
+        # Com1값 변경
+        is_connect1,input_ip1=click_TCP_connect(com_id=1)
+
+        # Com2는 현재값 그대로 return
+        is_connect2=page_status["setting_part"]["is_Com2_conOK"]
+        input_ip2=page_status["setting_part"]["Com2_ip"]
+
+        return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1,is_connect2=is_connect2,input_ip2=input_ip2)
+    
     elif Com_button=="Com1_disconnect":
-        return render_template('Setting/setting_index.html',is_connect1=False)
+        click_TCP_disconnect(com_id=1)
+
+        # Com2는 현재값 그대로 return
+        is_connect2=page_status["setting_part"]["is_Com2_conOK"]
+        input_ip2=page_status["setting_part"]["Com2_ip"]
+
+        return render_template('Setting/setting_index.html',is_connect1=False,is_connect2=is_connect2,input_ip2=input_ip2)
     
     # < COM2 URL Handling >
     elif Com_button=="Com2_connect":
-        is_connect2,input_ip2=click_com2()
-        return render_template('Setting/setting_index.html',is_connect2=is_connect2,input_ip2=input_ip2)
+        # Com2값 변경
+        is_connect2,input_ip2=click_TCP_connect(com_id=2)
+
+        # Com1은 현재값 그대로 return 
+        is_connect1=page_status["setting_part"]["is_Com1_conOK"]
+        input_ip1=page_status["setting_part"]["Com1_ip"]
+
+        return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1,is_connect2=is_connect2,input_ip2=input_ip2)
+    
     elif Com_button=="Com2_disconnect":
-        return render_template('Setting/setting_index.html',is_connect2=False)
+        click_TCP_disconnect(com_id=2)
+
+        # Com1는 현재값 그대로 return
+        is_connect1=page_status["setting_part"]["is_Com1_conOK"]
+        input_ip1=page_status["setting_part"]["Com1_ip"]
+
+        return render_template('Setting/setting_index.html',is_connect1=is_connect1,input_ip1=input_ip1,is_connect2=False)
 
     else:
         return redirect("/")
