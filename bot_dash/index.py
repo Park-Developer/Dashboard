@@ -14,6 +14,7 @@ def setting_index():
     초기 설정 정보는 외부 파일에서 옵로드 하게 하기
     '''
 
+
     # fetching from 'user' table 
     connect=sqlite3.connect("pybo.db")
     cur=connect.cursor()

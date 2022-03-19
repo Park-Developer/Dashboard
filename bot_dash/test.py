@@ -18,7 +18,8 @@ def index_setting(): # index화면 구성 함수
 
     #return render_template('index.html')
     is_commu_connect=False
-    return render_template('/Test/test_index.html',is_commu_connect=is_commu_connect,User_IP=page_status["login_part"]["User_IP"])
+    Robot_IP=page_status["login_part"]["Robot_IP"]
+    return render_template('/Test/test_index.html',is_commu_connect=is_commu_connect,Robot_IP=Robot_IP)
     
 def tcp_test():
     print("tcp_test")
@@ -105,7 +106,7 @@ def index_btn_click(index_button): # index화면 구성 함수
         selected_test="None"
     #return redirect("/")#(request.url)
     
-    return render_template('/Test/test_index.html',selected_test=selected_test,User_IP=page_status["login_part"]["User_IP"])
+    return render_template('/Test/test_index.html',selected_test=selected_test)
 
 # Communication Test Display
 @bp.route('/Test/selected_test/<select_test>/',methods=['POST'])
@@ -118,7 +119,7 @@ def display_test_setting(select_test): # index화면 구성 함수
         print("cancel btn click!")
 
         is_commu_connect=False
-    return render_template('/Test/test_index.html',is_commu_connect=is_commu_connect,User_IP=page_status["login_part"]["User_IP"])
+    return render_template('/Test/test_index.html',is_commu_connect=is_commu_connect)
 
 
 # Motor Test Display
@@ -127,4 +128,4 @@ def motor_ctrl(direction):
     selected_test="motor"
     selected_direction=direction
     
-    return render_template('/Test/test_index.html',selected_direction=selected_direction,selected_test=selected_test,User_IP=page_status["login_part"]["User_IP"])
+    return render_template('/Test/test_index.html',selected_direction=selected_direction,selected_test=selected_test)
